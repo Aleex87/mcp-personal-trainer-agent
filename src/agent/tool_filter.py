@@ -1,5 +1,7 @@
+
 def filter_tools(tools):
     allowed_tool_names = {
+# apply least privilege
         "generate_workout_plan",
         "get_daily_workout",
         "generate_meal_plan",
