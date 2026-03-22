@@ -1,13 +1,29 @@
-from langchain_core.tools import wrap_tool_call
-# get the result from the tool,
-# controll type take away extra space and set a limit of 300
+from langchain_core.tools import StructuredTool
 
-@wrap_tool_call
-def process_tool_output(result):
-    # type controll
-    if isinstance(result, str):
 
-        result = result.strip()
-        result = result[:300]
+def process_tool_output(tool):
 
-    return result
+    def safe_func(**kwargs):
+        result = tool.invoke(kwargs)
+
+        if isinstance(result, str):
+            result = result.strip()
+            result = result[:300]
+
+        return result
+
+    async def safe_func_async(**kwargs):
+        result = await tool.ainvoke(kwargs)
+
+        if isinstance(result, str):
+            result = result.strip()
+            result = result[:300]
+
+        return result
+
+    return StructuredTool.from_function(
+        func=safe_func,
+        coroutine=safe_func_async,
+        name=tool.name,
+        description=tool.description,
+    )

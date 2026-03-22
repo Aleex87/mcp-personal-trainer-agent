@@ -1,7 +1,8 @@
 import asyncio
 
-from agent.agent import build_agent
+from src.agent.agent import build_agent
 from util.pretty_print import print_welcome, get_user_input
+from util.streaming_utils import STREAM_MODES, handle_stream_async
 
 
 async def run_async():
@@ -22,17 +23,14 @@ async def run_async():
             print("Goodbye!")
             break
 
-        result = await agent.ainvoke(
+        process_stream = agent.astream(
             {
-                "messages": [
-                    {"role": "user", "content": user_input}
-                ]
-            }
+                "messages": [{"role": "user", "content": user_input}]
+            },
+            stream_mode=STREAM_MODES,
         )
 
-        print("\nResponse:")
-        print(result["messages"][-1].content)
-        print("\n" + "-" * 50)
+        await handle_stream_async(process_stream, agent_name="Trainer Agent")
 
 
 def run():
